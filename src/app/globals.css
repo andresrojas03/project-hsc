@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme{
+  /*Link to the CSS variable to a Tailwind utility*/
+  --font-serif-custom: var(--font-cursive);
+
+  /*Color palette for the vibe*/
+  --color-cosmic-deep: #111827;
+  --color-cosmic-purple: #1e1b4b;
+  --color-horizon-orange: #ff8c42;
+  --color-firefly-lime: #ccff00;
+
+  
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  .old-school-script{
+    font-family: var(--font-cursive), cursive !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity 0.5s ease-in-out;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+:root{
+  color-scheme: dark;
+}
+
+html, body{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  /*Using the theme variables to create the whole vibe*/
+  background-image: linear-gradient(
+    to bottom, 
+    #111827 0%,
+    #1e1b4b 20%,
+    #4c1d95 60%,
+    #ff8c42 100%
+  );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #f8fafc;
+  font-family: sans-serif;
+
+  background-color: #111827;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0px);}
+}
+
+.letter-card-animate {
+  animation: fadeInUp 1s ease-out forwards;
 }

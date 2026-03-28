@@ -25,7 +25,7 @@ export default function JeffersonDisk(){
             },
             {
                 root: null,
-                rootMargin: '-48% 0px -48% 0px',
+                rootMargin: '-50% 0px -50% 0px',
                 threshold: 0
             }
         );

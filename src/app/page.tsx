@@ -5,6 +5,7 @@ import { NavLink } from '@/components/NavLink'
 import { Sparkles, BrainCircuit, MicVocal } from 'lucide-react';
 
 
+
 export default function Home() {
   const letterData = {
     title: "Hello Sweetheart.",

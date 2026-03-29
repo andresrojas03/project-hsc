@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import JeffersonDisk from '@/components/JeffersonDisk';
 
-// Helper to shuffle (or just paste your hardcoded strings here)
 const shuffle = (array: string[]) => {
     const s = [...array];
     for (let i = s.length - 1; i > 0; i--) {
@@ -17,53 +16,62 @@ const TARGET_WORD = "MARIAVALES";
 
 export default function UnknownPage() {
     const [isSolved, setIsSolved] = useState(false);
-    const [currentWord, setCurrentWord] = useState<string[]>(Array(10).fill(''));
-    // Create the rotors once
+    
+    // Changed this to a simple string to prevent memory reference loops
+    const [currentWord, setCurrentWord] = useState<string>('');
+
     const MY_ROTORS = useMemo(() => {
         return Array.from({ length: 10 }, () => shuffle(ALPHABET));
     }, []);
 
-    const handleWordChange = (currentWord: string) => {
-        if (currentWord === TARGET_WORD) {
+    // 👇 ADDED useCallback HERE 👇
+    const handleWordChange = useCallback((word: string) => {
+        const upperWord = word.toUpperCase();
+
+        setCurrentWord(upperWord); // Just saving the string now
+
+        if (upperWord === TARGET_WORD) {
             setIsSolved(true);
+        } else {
+            setIsSolved(false);
         }
-    };
+    }, []); // Empty brackets mean this function never gets recreated
 
     return (
-        <main className="relative min-h-screen bg-[#0a0a0a] overflow-hidden flex flex-col items-center justify-center">
-        
-        {/* --- CORRECTED ORIENTATION LOCK --- */}
-        {/* 'hidden' by default, 'flex' only when in landscape mode */}
-        <div className="fixed inset-0 z-[1000] hidden landscape:flex flex-col items-center justify-center bg-black text-orange-700 p-10 text-center">
-            <div className="mb-4 animate-bounce">
-                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="5" y="2" width="14" height="20" rx="2" />
-                    <path d="M12 18h.01" />
-                </svg>
-            </div>
-            <h1 className="font-mono text-xl uppercase tracking-widest">
-                Portrait Mode Required
-            </h1>
-            <p className="mt-2 font-mono text-sm opacity-70">
-                Please rotate your device to align the mechanical cylinders.
+        <>
+        <div className="landscape:hidden portrait:flex fixed inset-0 z-[9999] flex-col items-center justify-center bg-slate-950 text-slate-200 px-6 text-center">
+            <h2 className="mb-2 text-xl font-bold tracking-widest uppercase">
+            Orientation Override
+            </h2>
+            <p className="font-mono text-sm text-slate-400">
+            The cryptographic apparatus requires a vertical viewport. 
+            <br /><br />
+            Please rotate your device to Portrait Mode to continue.
             </p>
         </div>
 
-        <div className="flex flex-col items-center justify-center min-h-screen ">
+        {/* Added 'relative' here to contain the absolute message below */}
+        <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#0a0a0a]">
             <h2 className="mb-4 font-mono text-orange-900">
-                {isSolved ? "MEMORY DECRYPTED" : "MEMORY LOCKED"}
+                {isSolved ? "MESSAGE DECRYPTED" : "MEMORY LOCKED"}
             </h2>
+
             <JeffersonDisk 
                 rotors={MY_ROTORS} 
                 onWordChange={handleWordChange} 
             />
 
-            {isSolved && (
-                <div className="mt-8 p-4 border border-green-500 text-green-500 animate-pulse">
-                    ACCESS GRANTED: [Your Secret Message Here]
-                </div>
-            )}
+            {/* 
+                THE FIX: 
+                1. Absolute positioning means it won't push the disk around.
+                2. We use opacity instead of unmounting it to prevent any DOM recalculation.
+            */}
+            <div 
+                className={`absolute bottom-16 p-4 border border-green-500 text-green-500 font-mono text-center transition-opacity duration-300 ${isSolved ? 'opacity-100 animate-pulse' : 'opacity-0 pointer-events-none'}`}
+            >
+                ACCESS GRANTED: Look for the next Jefferson disk.
+            </div>
         </div>
-        </main>
+        </>
     );
 }

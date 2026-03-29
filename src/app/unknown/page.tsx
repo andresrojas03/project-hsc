@@ -28,16 +28,7 @@ export default function UnknownPage() {
         <h1 className="mb-4 font-mono text-sm tracking-widest text-slate-500 uppercase">
           System Override // Awaiting Cipher
         </h1>
-
-        {/* 🔴 THE NEW VISUAL TEST BUTTON 🔴 */}
-        <button 
-          onClick={handleTest}
-          className="relative z-[9999] mb-8 rounded bg-red-600 px-6 py-3 font-bold text-white shadow-lg active:scale-95"
-        >
-          {btnText}
-        </button>
-
-        <JeffersonDisk />
+        <JeffersonDisk/>
       </main>
     </>
   );

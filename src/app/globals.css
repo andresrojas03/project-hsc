@@ -66,7 +66,8 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
-  image-rendering: pixelated;
+  overflow: hidden;
+  margin: 0 auto;
 }
 
 .apparatus-frame {
@@ -75,33 +76,53 @@ body{
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 10;
-  pointer-events: none;
+  z-index: 50;
+  pointer-events: none; /* Allows you to scroll "through" the frame */
+  object-fit: contain;
 }
 
 .cylinder-tracks-container {
   display: flex;
   flex-direction: row;
   gap: 2px;
-  z-index: 1;
+  z-index: 10;
+  height: 240px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 85%,
+    transparent 100%
+  );
+  /* Optional: keeps the mask sharp for pixel art */
+  mask-mode: alpha;
+  -webkit-mask-mode: alpha;
 }
 
 .scrollable-strip {
-  height: 200px;
+  height: 100%;
   overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
   scroll-snap-type: y mandatory;
-  scrollbar-width: none;
 }
 
 .scrollable-strip::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome/Safari */
 }
 
 .letter-tile {
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 40px;  /* Must match TILE_WIDTH in JS */
+  height: 48px; /* Adjust to make your letters square */
+  flex-shrink: 0;
   scroll-snap-align: center;
-  background-image: url('/frame.png');
+  background-repeat: no-repeat;
+  background-image: url('/Stripe.png');
 }

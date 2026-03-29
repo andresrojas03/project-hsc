@@ -32,8 +32,8 @@ export default function JeffersonDisk({ rotors, onWordChange }: JeffersonDiskPro
                     const letter = entry.target.getAttribute('data-letter');
                     console.log("Detecting Letter:", letter);
                     // Haptic Feedback
-                    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-                        window.navigator.vibrate(15);
+                    if (typeof window !== 'undefined' && window.navigator?.vibrate) {
+                        window.navigator.vibrate(20);
                     }
 
                     // Extract data from the tile that just hit the center
@@ -85,6 +85,7 @@ export default function JeffersonDisk({ rotors, onWordChange }: JeffersonDiskPro
                             key={`col-${colIndex}`} 
                             className="scrollable-strip" 
                             ref={(el) => addToRefs(el, colIndex)}
+                            onTouchStart={() => {if(navigator.vibrate) navigator.vibrate(1); }}
                         >
                             {columnTiles.map((letter, i) => {
                                 const letterIndex = ALPHABET.indexOf(letter);

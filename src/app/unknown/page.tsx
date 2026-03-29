@@ -30,6 +30,22 @@ export default function UnknownPage() {
     };
 
     return (
+        <main className="relative min-h-screen bg-[#0a0a0a] overflow-hidden flex flex-col items-center justify-center">
+        <div className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black text-orange-700 p-10 text-center landscape:flex portrait:hidden">
+            <div className="mb-4 animate-bounce">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" />
+                    <path d="M12 18h.01" />
+                </svg>
+            </div>
+            <h1 className="font-mono text-xl uppercase tracking-widest">
+                System Interface Restricted
+            </h1>
+            <p className="mt-2 font-mono text-sm opacity-70">
+                Please rotate your device to Portrait Mode to bypass the cipher.
+            </p>
+        </div>
+
         <div className="flex flex-col items-center justify-center min-h-screen ">
             <h2 className="mb-4 font-mono text-orange-900">
                 {isSolved ? "MEMORY DECRYPTED" : "MEMORY LOCKED"}
@@ -45,5 +61,6 @@ export default function UnknownPage() {
                 </div>
             )}
         </div>
+        </main>
     );
 }

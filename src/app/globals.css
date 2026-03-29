@@ -87,7 +87,6 @@ body{
   gap: 2px;
   z-index: 10;
   height: 240px;
-  overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,

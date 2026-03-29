@@ -1,106 +1,116 @@
-'use client';
+"use client";
+import React, { useEffect, useRef } from 'react';
 
-import React, { useRef, useEffect } from 'react';
+// Standard mapping for your Stripe.png
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
 
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-// We triple the alphabet to allow infinite-feeling scrolling
-const TILES = [...ALPHABET, ...ALPHABET, ...ALPHABET,...ALPHABET, ...ALPHABET, ...ALPHABET];
-const COLUMN_COUNT = 10; // We're now building 10 wooden disks
-const TILE_HEIGHT = 48;   // The width of ONE letter in your letters.jpg
+interface JeffersonDiskProps {
+    rotors: string[][]; // The 10 arrays of letters
+    onWordChange: (word: string) => void;
+}
 
+export default function JeffersonDisk({ rotors, onWordChange }: JeffersonDiskProps) {
+    // The "Brain" state
+    const [currentWord, setCurrentWord] = React.useState<string[]>(Array(rotors.length).fill(''));
 
-const shuffle = (array: string[]) =>{
-    const shuffled = [...array];
-    for(let i = shuffled.length -1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i +1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; 
-    }
-    return shuffled;
-} 
+    // Report back to the Page whenever the word changes
+    useEffect(() => {
+        onWordChange(currentWord.join(''));
+    }, [currentWord, onWordChange]);
 
-
-
-export default function JeffersonDisk() {
-
-    const columnAlphabets = React.useMemo(() => {
-        return Array.from({ length: COLUMN_COUNT}, () => shuffle(ALPHABET));
-    }, []);
-
-    // We use an array of refs for the 10 columns
     const stripRefs = useRef<(HTMLDivElement | null)[]>([]);
+    
     const addToRefs = (el: HTMLDivElement | null, index: number) => {
-        if (el && !stripRefs.current.includes(el)) {
-            stripRefs.current[index] = el;
-        }
+        if (el) stripRefs.current[index] = el;
     };
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                            navigator.vibrate(15);
-                        }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+
+                    const letter = entry.target.getAttribute('data-letter');
+                    console.log("Detecting Letter:", letter);
+                    // Haptic Feedback
+                    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+                        window.navigator.vibrate(15);
                     }
-                });
-            },
-            {
-                root: null,
-                // Shrinking the 'trigger' area to a thin line in the middle
-                rootMargin: '-49% 0px -49% 0px', 
-                threshold: 0
-            }
-        );
+
+                    // Extract data from the tile that just hit the center
+                    const activeLetter = entry.target.getAttribute('data-letter');
+                    const colIndexStr = entry.target.getAttribute('data-col');
+
+                    if (activeLetter && colIndexStr !== null) {
+                        const colIndex = parseInt(colIndexStr, 10);
+                        setCurrentWord(prevWord => {
+                            const newWord = [...prevWord];
+                            if (newWord[colIndex] !== activeLetter) {
+                                newWord[colIndex] = activeLetter;
+                                return newWord;
+                            }
+                            return prevWord;
+                        });
+                    }
+                }
+            });
+        }, {
+            rootMargin: '-50% 0px -50% 0px', 
+            threshold: 0
+        });
 
         stripRefs.current.forEach(strip => {
             if (strip) {
                 const tiles = strip.querySelectorAll('.letter-tile');
                 tiles.forEach(tile => observer.observe(tile));
-                // Start the scroll in the middle section of our tripled list
-                strip.scrollTop = (strip.scrollHeight / 3)+36;
+                // Initial offset so it looks "eaten" and starts in the middle set
+                const startPos = 26 * 48;
+                strip.scrollTop = startPos;
             }
         });
 
         return () => observer.disconnect();
-    }, []);
+    }, [rotors]); // Re-run if rotors change
 
     return (
-    <div className="disk-assembly-container">
-        {/* Your frame stays on top */}
-        <img src="/frame.png" className="apparatus-frame" alt="Disk Frame" />
-        
-        <div className="cylinder-tracks-container">
-            {/* --- ADD THE SCRAMBLED MAPPING HERE --- */}
-            {columnAlphabets.map((shuffledAlphabet, colIndex) => {
-                // Triple the specific scrambled alphabet for infinite scroll
-                const columnTiles = [...shuffledAlphabet, ...shuffledAlphabet, ...shuffledAlphabet];
+        <div className="disk-assembly-container">
+            <img src="/frame.png" className="apparatus-frame" alt="Disk Frame" />
+            
+            <div className="cylinder-tracks-container">
+                {rotors.map((shuffledAlphabet, colIndex) => {
+                    const columnTiles = [...shuffledAlphabet, ...shuffledAlphabet, ...shuffledAlphabet];
 
-                return (
-                    <div 
-                        key={`col-${colIndex}`} 
-                        className="scrollable-strip" 
-                        ref={(el) => addToRefs(el, colIndex)}
-                    >
-                        {columnTiles.map((letter, i) => {
-                            // Find where this letter lives in your vertical Stripe.png
-                            const letterIndex = ALPHABET.indexOf(letter);
-                            
-                            // Your pixel-perfect math
-                            const TILE_HEIGHT = 48;
-                            const topCapHeight = 0;
-                            const yOffset = -(letterIndex * TILE_HEIGHT) - topCapHeight;
+                    return (
+                        <div 
 
-                            return (
-                                <div key={`tile-${colIndex}-${i}`} className="letter-tile" style={{backgroundImage: `url('/letters.png'), url('/Stripe.png')`, backgroundPosition: `center ${yOffset}px`, backgroundSize: '100% auto', backgroundRepeat: 'no-repeat', imageRendering: 'pixelated'}}
-                                
-                                />
-                            );
-                        })}
-                    </div>
-                );
-            })}
+                            key={`col-${colIndex}`} 
+                            className="scrollable-strip" 
+                            ref={(el) => addToRefs(el, colIndex)}
+                        >
+                            {columnTiles.map((letter, i) => {
+                                const letterIndex = ALPHABET.indexOf(letter);
+                                const TILE_HEIGHT = 48;
+                                const yOffset = -(letterIndex * TILE_HEIGHT);
+
+                                return (
+                                    <div 
+                                        key={`tile-${colIndex}-${i}`} 
+                                        className="letter-tile" 
+                                        data-letter={letter} 
+                                        data-col={colIndex} 
+                                        style={{
+                                            backgroundImage: `url('/letters.png'), url('/Stripe.png')`, 
+                                            backgroundPosition: `center ${yOffset}px`, 
+                                            backgroundSize: '100% auto', 
+                                            backgroundRepeat: 'no-repeat', 
+                                            imageRendering: 'pixelated'
+                                        }}
+                                    />
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
         </div>
-    </div>
-);
+    );
 }

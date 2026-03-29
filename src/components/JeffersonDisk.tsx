@@ -40,7 +40,7 @@ export default function JeffersonDisk() {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                            navigator.vibrate([10, 30, 5]);
+                            navigator.vibrate(15);
                         }
                     }
                 });

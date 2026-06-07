@@ -17,8 +17,8 @@ export default function SpotifyPage(){
             </Link>
 
             <header className="mb-10 text-center">
-                <h1 className="text-4xl font-bold text-slate-100 mb-2">The Frequency</h1>
-                <p className="text-violet-300 italic text-lg">All the special moments come with some music.</p>
+                <h1 className="text-4xl font-bold text-slate-100 mb-2">Nuestra Frecuencia</h1>
+                <p className="text-violet-300 italic text-lg">Todos los momentos especiales vienen con música incluída.</p>
             </header>
 
             {/* Spotify playlist*/}
